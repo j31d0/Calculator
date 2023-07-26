@@ -1,5 +1,6 @@
 package calculator
-import math.Ordering.Implicits.infixOrderingOps
+import calculator.numeric.{CRat, CRatGen}
+import CRatGen.given
 
 object AInterp:
 
@@ -19,6 +20,11 @@ object AInterp:
     )
 
     def square(a: RBall): RBall = mult(a, a)
+
+    def reciprocal(a: RBall): RBall = new RBall(
+        1 / a.c,
+        a.rad / (a.c.l1norm.square)
+    )
 
 
 end AInterp

@@ -42,10 +42,6 @@ object Main:
     println(s"Welcome to the $M$name$RESET REPL.")
     println(s"Type in :q, :quit, or the EOF character to terminate the REPL.")
 
-    val p = CRatPoly.from(1, 2, 0, 4, 0, 6)
-    val eb = p.find_roots
-    println(s"root ball: $eb")
-
     var globalEnv: Env = Env(mutable.Map.empty)
     for (str <- strs(name).takeWhile(s => !eof(s)) if str.trim.nonEmpty) {
       val opt = lift {
@@ -57,17 +53,16 @@ object Main:
       opt.foreach(cmd =>
         cmd match {
           case Command.Let(s, e) =>
-            lift (Interp.eval(e, globalEnv).map{
+            lift (Interp.eval(e, globalEnv) match {
               case r: Root => r.refine_by(NRat(1,NPos(100)))
               case p => p
             }) match
               case None => ()
-              case Some(value :: Nil) =>
+              case Some(value) =>
                 globalEnv.e(s) = value
                 println(s" $s = $value")
-              case Some(_) => println(s" Asssign only one value to a variable.")
           case Command.Expr(e) =>
-            lift (Interp.eval(e, globalEnv).map{
+            lift (Interp.eval(e, globalEnv) match {
               case r: Root => r.refine_by(NRat(1,NPos(100)))
               case p => p
             }) match

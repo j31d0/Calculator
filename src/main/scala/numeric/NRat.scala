@@ -1,7 +1,7 @@
 package calculator.numeric
 import calculator.property.TotalOrder
 
-class NRat(n_ : NInt, d_ : NPos) extends TotalOrder[NRat]:
+class NRat(n_ : NInt, d_ : NPos) extends TotalOrder[NRat] with Field[NRat]:
     val (n, d) = if n_ eqR 0 then (NInt(0), NPos(1)) else
         val g = n_.n.gcd(d_.n)
         (NInt(n_.n / g), NPos(d_.n / g))
@@ -28,7 +28,9 @@ class NRat(n_ : NInt, d_ : NPos) extends TotalOrder[NRat]:
 end NRat
 
 
-object NRat:
+object NRat extends FieldGen[NRat]:
+    val zero: NRat = NRat(NInt(0), NPos(1))
+    val one: NRat = NRat(NInt(1), NPos(1))
     def apply(n: NInt, d: NPos): NRat = new NRat(n, d)
 
     given fromIntToNRat: Conversion[Int, NRat] with

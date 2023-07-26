@@ -1,5 +1,6 @@
 package calculator
-import calculator.numeric.CRat
+import calculator.numeric.{CRat, CRatGen}
+import CRatGen.given
 import calculator.numeric.NRat
 import calculator.property.Equivalence
 import calculator.numeric.NPos

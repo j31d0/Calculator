@@ -1,7 +1,7 @@
 package calculator.numeric
 import calculator.property.Equivalence
 
-class CRat(nr_ : NInt, cr_ : NInt, d_ : NPos) extends Equivalence[CRat]:
+class CRat(nr_ : NInt, cr_ : NInt, d_ : NPos) extends Equivalence[CRat] with Field[CRat]:
     val (nr, cr, d) = if nr_ eqR 0 then
         if cr_ eqR 0 then
             (NInt(0), NInt(0), NPos(1))
@@ -39,16 +39,47 @@ class CRat(nr_ : NInt, cr_ : NInt, d_ : NPos) extends Equivalence[CRat]:
         assert (cr eqR 0)
         NRat(nr, d)
 
+    def compare_distance(other: CRat): Int =
+        val a = l2square
+        val b = other.l2square
+        if a eqR b then 0
+        else if a < b then -1
+        else 1
+
+    def compare_angle (other: CRat): Int =
+        if (cr > 0 || ((cr eqR 0) && nr >= 0)) then
+            if (other.cr > 0 || ((other.cr eqR 0) && other.nr >= 0)) then
+                val r = NRat(nr, d) * NRat(other.cr, other.d) - NRat(cr, d) * NRat(other.nr, other.d)
+                if r eqR 0 then 0
+                else if r < 0 then -1
+                else 1
+            else -1
+        else
+            if (other.cr > 0 || ((other.cr eqR 0) && other.nr >= 0)) then
+                1
+            else
+                val r = NRat(nr, d) * NRat(other.cr, other.d) - NRat(cr, d) * NRat(other.nr, other.d)
+                if r eqR 0 then 0
+                else if r < 0 then 1
+                else -1
+
+    def lt_angle_dist (other: CRat): Boolean =
+        if this eqR other then false
+        else
+            val a = compare_angle(other)
+            if a == 0 then compare_distance(other) < 0
+            else a < 0
 end CRat
 
 
-object CRat:
+given CRatGen: FieldGen[CRat] with
     def apply(nr: NInt, cr: NInt, d: NPos): CRat = new CRat(nr, cr, d)
-
+    val one = CRat(NInt(1), NInt(0), NPos(1))
+    val zero = CRat(NInt(0), NInt(0), NPos(1))
 
 
     given fromIntToCRat: Conversion[Int, CRat] with
         def apply(n: Int): CRat = CRat(NInt(n), NInt(0), NPos(1))
     given fromBigIntToCRat: Conversion[BigInt, CRat] with
         def apply(n: BigInt): CRat = CRat(NInt(n), NInt(0), NPos(1))
-end CRat
+end CRatGen
